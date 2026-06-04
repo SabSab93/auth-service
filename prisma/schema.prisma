@@ -7,45 +7,45 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int        @id @default(autoincrement())
-  firstname String
-  email     String     @unique
-  password  String
-  responses Response[]
-  createdAt DateTime   @default(now())
-}
-
-model Qcm {
-  id        Int        @id @default(autoincrement())
-  name      String
-  questions Question[]
-  createdAt DateTime   @default(now())
-}
-
-model Question {
-  id           Int           @id @default(autoincrement())
-  description  String
-  qcmId        Int
-  qcm          Qcm           @relation(fields: [qcmId], references: [id], onDelete: Cascade)
-  propositions Proposition[]
-}
-
 model Proposition {
   id          Int        @id @default(autoincrement())
   description String
   isValid     Boolean
   questionId  Int
-  question    Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  responses   Response[]
+  Question    Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  Response    Response[]
+}
+
+model Qcm {
+  id        Int        @id @default(autoincrement())
+  name      String
+  createdAt DateTime   @default(now())
+  Question  Question[]
+}
+
+model Question {
+  id          Int           @id @default(autoincrement())
+  description String
+  qcmId       Int
+  Proposition Proposition[]
+  Qcm         Qcm           @relation(fields: [qcmId], references: [id], onDelete: Cascade)
 }
 
 model Response {
   propositionId Int
   userId        Int
-  proposition   Proposition @relation(fields: [propositionId], references: [id], onDelete: Cascade)
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   isChecked     Boolean
+  Proposition   Proposition @relation(fields: [propositionId], references: [id], onDelete: Cascade)
+  User          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([propositionId, userId])
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  firstname String
+  email     String     @unique
+  password  String
+  createdAt DateTime   @default(now())
+  Response  Response[]
 }
